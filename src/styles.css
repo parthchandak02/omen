@@ -117,3 +117,37 @@ button {
   background-color: color-mix(in oklab, var(--foreground) 10%, transparent);
   background-clip: padding-box;
 }
+
+/* The Toolcraft shell has a 1024px minimum width; on phones let it shrink to the
+   screen so the scene is centred and the controls panel is reachable */
+@media (max-width: 1023px) {
+  [data-slot="toolcraft-runtime-app"] {
+    min-width: 0 !important;
+  }
+}
+
+/* Below desktop widths the data stamp runs into the toolbar button (and wraps on phones);
+   lift it, the legend and the description */
+@media (max-width: 1023px) {
+  #stamp {
+    bottom: 56px !important;
+    right: 16px;
+  }
+  #legend {
+    bottom: 100px !important;
+  }
+  #desc {
+    bottom: 122px !important;
+    width: 90vw;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Clear the collapsed controls header at the top right */
+  #hero {
+    top: 64px !important;
+  }
+  #notice {
+    top: 150px !important;
+  }
+}

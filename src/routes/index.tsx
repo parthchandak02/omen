@@ -8,6 +8,15 @@ export function AppHome(): React.JSX.Element {
   const [heroText, setHeroText] = useState('--');
   const [notice, setNotice] = useState<string | null>(null);
 
+  // On phones the controls panel would cover the scene; start it collapsed to its header
+  useEffect(() => {
+    if (!window.matchMedia('(max-width: 600px)').matches) return;
+    const t = window.setTimeout(() => {
+      document.querySelector<HTMLButtonElement>('[aria-label="Collapse controls"]')?.click();
+    }, 0);
+    return () => window.clearTimeout(t);
+  }, []);
+
   // Listen for data updates from the canvas
   useEffect(() => {
     const handler = (e: Event) => {

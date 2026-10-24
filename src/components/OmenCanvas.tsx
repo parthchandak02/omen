@@ -157,10 +157,12 @@ export function OmenCanvas({ nameDataRef, onDataUpdate }: Props): React.JSX.Elem
     let W: number, H: number;
     let dpr: number;
 
+    // Size the drawing buffer to the canvas element itself, not the window: on narrow
+    // screens the two differ and the drawing would be stretched
     function resize() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = window.innerWidth;
-      H = window.innerHeight;
+      W = canvas!.clientWidth || window.innerWidth;
+      H = canvas!.clientHeight || window.innerHeight;
       canvas!.width = W * dpr;
       canvas!.height = H * dpr;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -169,6 +171,8 @@ export function OmenCanvas({ nameDataRef, onDataUpdate }: Props): React.JSX.Elem
 
     const listener = () => resize();
     window.addEventListener('resize', listener);
+    const resizeObserver = new ResizeObserver(listener);
+    resizeObserver.observe(canvas);
 
     let useCount = particleCount;
     let useSpeed = auraSpeed;
@@ -395,6 +399,7 @@ export function OmenCanvas({ nameDataRef, onDataUpdate }: Props): React.JSX.Elem
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', listener);
+      resizeObserver.disconnect();
     };
   }, [muted, particleCount, auraSpeed]);
 
