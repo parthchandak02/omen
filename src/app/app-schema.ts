@@ -18,10 +18,10 @@ export const appSchema = defineToolcraft({
               defaultValue: "Alex",
             },
             randomName: {
-              type: "action",
+              type: "actions",
               target: "randomName",
-              label: "Random",
-              actions: [{ value: "randomName", variant: "outline" }],
+              label: false,
+              actions: [{ label: "Random", value: "randomName", variant: "outline" }],
             },
           },
         },
@@ -29,7 +29,7 @@ export const appSchema = defineToolcraft({
           title: "Visuals",
           controls: {
             particleCount: {
-              type: "number",
+              type: "slider",
               target: "particleCount",
               label: "Particles",
               defaultValue: 20,
@@ -38,7 +38,7 @@ export const appSchema = defineToolcraft({
               step: 1,
             },
             auraSpeed: {
-              type: "number",
+              type: "slider",
               target: "auraSpeed",
               label: "Aura Speed",
               defaultValue: 0.5,

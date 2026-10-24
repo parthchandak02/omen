@@ -14,10 +14,13 @@ export function setTriggerRandom(fn: () => void) {
 
 const handlePanelAction: ToolcraftPanelActionHandler = (context) => {
   if (context.action.value === "randomName") {
-    const random = generateRandomName();
-    // We'll handle this via the name input control value
-    // For now, dispatch a custom event that the canvas picks up
-    window.dispatchEvent(new CustomEvent('omen-random-name', { detail: random }));
+    // Writing the Name field shows the new name and triggers the usual debounced lookup
+    context.dispatch({
+      label: "Random name",
+      target: "nameInput",
+      type: "controls.setValue",
+      value: generateRandomName(),
+    });
   }
 };
 

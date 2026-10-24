@@ -66,40 +66,68 @@ export const FALLBACK_DATA: NameData = {
   ],
 };
 
-export async function fetchNameData(name: string): Promise<NameData> {
+export type NameFetchStatus = 'live' | 'rate-limited' | 'error';
+
+export interface NameFetchResult {
+  data: NameData;
+  status: NameFetchStatus;
+  /** Human-readable reason when status is not 'live' */
+  reason?: string;
+}
+
+function sampleResult(status: NameFetchStatus, reason: string): NameFetchResult {
+  // Show the built-in "Alex" sample under its own name, never under the name that failed
+  return { data: { ...FALLBACK_DATA }, status, reason };
+}
+
+export async function fetchNameData(name: string): Promise<NameFetchResult> {
   const clean = name.trim().toLowerCase();
-  if (!clean) return { ...FALLBACK_DATA, name };
+  if (!clean) return sampleResult('error', 'no name');
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
+  const query = encodeURIComponent(clean);
 
   try {
-    const [agifyRes, genderizeRes, nationalizeRes] = await Promise.all([
-      fetch(`https://api.agify.io?name=${clean}`, { signal: controller.signal }),
-      fetch(`https://api.genderize.io?name=${clean}`, { signal: controller.signal }),
-      fetch(`https://api.nationalize.io?name=${clean}`, { signal: controller.signal }),
+    const responses = await Promise.all([
+      fetch(`https://api.agify.io?name=${query}`, { signal: controller.signal }),
+      fetch(`https://api.genderize.io?name=${query}`, { signal: controller.signal }),
+      fetch(`https://api.nationalize.io?name=${query}`, { signal: controller.signal }),
     ]);
 
     clearTimeout(timeout);
 
-    const agify = await agifyRes.json();
-    const genderize = await genderizeRes.json();
-    const nationalize = await nationalizeRes.json();
+    // The free tier answers 429 {"error":"Request limit reached"} once the daily quota is used
+    if (responses.some((r) => r.status === 429)) {
+      return sampleResult('rate-limited', 'daily request limit reached (HTTP 429)');
+    }
+    const failed = responses.find((r) => !r.ok);
+    if (failed) {
+      return sampleResult('error', `HTTP ${failed.status}`);
+    }
+
+    const [agify, genderize, nationalize] = await Promise.all(responses.map((r) => r.json()));
+    if (agify.error || genderize.error || nationalize.error) {
+      return sampleResult('error', String(agify.error ?? genderize.error ?? nationalize.error));
+    }
 
     return {
-      name: clean,
-      age: agify.age ?? null,
-      ageCount: agify.count ?? 0,
-      gender: genderize.gender ?? null,
-      genderProbability: genderize.probability ?? 0,
-      genderCount: genderize.count ?? 0,
-      countries: (nationalize.country ?? [])
-        .sort((a: any, b: any) => b.probability - a.probability)
-        .slice(0, 8)
-        .map((c: any) => ({ code: c.country_id, probability: c.probability })),
+      status: 'live',
+      data: {
+        name: clean,
+        age: agify.age ?? null,
+        ageCount: agify.count ?? 0,
+        gender: genderize.gender ?? null,
+        genderProbability: genderize.probability ?? 0,
+        genderCount: genderize.count ?? 0,
+        countries: (nationalize.country ?? [])
+          .sort((a: any, b: any) => b.probability - a.probability)
+          .slice(0, 8)
+          .map((c: any) => ({ code: c.country_id, probability: c.probability })),
+      },
     };
-  } catch {
+  } catch (e) {
     clearTimeout(timeout);
-    return { ...FALLBACK_DATA, name: clean };
+    return sampleResult('error', e instanceof DOMException && e.name === 'AbortError' ? 'timed out' : 'network error');
   }
 }

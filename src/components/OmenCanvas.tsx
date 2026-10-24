@@ -84,17 +84,24 @@ export function OmenCanvas({ nameDataRef, onDataUpdate }: Props): React.JSX.Elem
   const doFetch = React.useCallback((name: string) => {
     const id = ++fetchIdRef.current;
     setStamp(`Agify + Genderize + Nationalize · prediction · loading "${name}"...`);
-    fetchNameData(name).then(data => {
+    fetchNameData(name).then(({ data, status, reason }) => {
       if (id !== fetchIdRef.current) return;
       targetDataRef.current = data;
       transitionRef.current = 0;
       if (nameDataRef) nameDataRef.current = data;
-      const ago = 'just now';
-      setStamp(`Agify + Genderize + Nationalize · prediction · live · ${ago}`);
-      if (onDataUpdate) onDataUpdate(data, `Agify + Genderize + Nationalize · prediction · live · ${ago}`);
+      const stampText = status === 'live'
+        ? 'Agify + Genderize + Nationalize · prediction · live · just now'
+        : `Agify + Genderize + Nationalize · ${reason ?? 'unavailable'} · fallback · sample data for "Alex"`;
+      const notice = status === 'live'
+        ? null
+        : status === 'rate-limited'
+          ? `Couldn't look up "${name}": the free prediction APIs' daily limit is used up. Showing sample data for "Alex".`
+          : `Couldn't look up "${name}" (${reason ?? 'error'}). Showing sample data for "Alex".`;
+      setStamp(stampText);
+      if (onDataUpdate) onDataUpdate(data, stampText);
       // Dispatch event for route chrome
       window.dispatchEvent(new CustomEvent('omen-data-update', {
-        detail: { stamp: `Agify + Genderize + Nationalize · prediction · live · ${ago}`, age: data.age, name: data.name }
+        detail: { stamp: stampText, age: data.age, name: data.name, notice }
       }));
     });
   }, [nameDataRef, onDataUpdate]);
@@ -126,7 +133,7 @@ export function OmenCanvas({ nameDataRef, onDataUpdate }: Props): React.JSX.Elem
   // Init particles
   React.useEffect(() => {
     const particles: Particle[] = [];
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 60; i++) {
       const country = COUNTRIES[i % COUNTRIES.length];
       particles.push({
         angle: Math.random() * Math.PI * 2,

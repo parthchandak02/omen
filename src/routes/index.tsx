@@ -6,6 +6,7 @@ import { appComposition } from "../app/app-composition";
 export function AppHome(): React.JSX.Element {
   const [stampText, setStampText] = useState('Agify + Genderize + Nationalize · prediction · loading...');
   const [heroText, setHeroText] = useState('--');
+  const [notice, setNotice] = useState<string | null>(null);
 
   // Listen for data updates from the canvas
   useEffect(() => {
@@ -13,6 +14,7 @@ export function AppHome(): React.JSX.Element {
       const detail = (e as CustomEvent).detail;
       if (detail.stamp) setStampText(detail.stamp);
       if (detail.age !== undefined) setHeroText(`${Math.round(detail.age)}`);
+      if (detail.notice !== undefined) setNotice(detail.notice);
     };
     window.addEventListener('omen-data-update', handler);
     return () => window.removeEventListener('omen-data-update', handler);
@@ -29,13 +31,13 @@ export function AppHome(): React.JSX.Element {
         schema={appComposition.schema}
       />
 
-      {/* Hero number */}
+      {/* Hero number (top-left, clear of the controls panel on the right) */}
       <div id="hero" style={{
         position: 'fixed',
         top: 24,
-        right: 24,
+        left: 24,
         zIndex: 100,
-        textAlign: 'right',
+        textAlign: 'left',
         pointerEvents: 'none',
       }}>
         <div style={{
@@ -57,6 +59,24 @@ export function AppHome(): React.JSX.Element {
           predicted age (years)
         </div>
       </div>
+
+      {/* Lookup failure notice (rate limit, network error) */}
+      {notice && (
+        <div id="notice" role="status" style={{
+          position: 'fixed',
+          top: 112,
+          left: 24,
+          zIndex: 100,
+          fontSize: 12,
+          lineHeight: 1.4,
+          color: '#ffab70',
+          fontFamily: 'system-ui, sans-serif',
+          pointerEvents: 'none',
+          width: 'min(36ch, calc(100vw - 48px))',
+        }}>
+          {notice}
+        </div>
+      )}
 
       {/* Data stamp */}
       <div id="stamp" style={{
