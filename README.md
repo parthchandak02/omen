@@ -39,16 +39,19 @@ around the name. These are population statistics about a name, not facts about a
 
 | API | Field | Drawn as |
 |---|---|---|
-| [agify.io](https://agify.io) | `age`, `count` | Vertical bar above the name (0 to 90 years), its label, and the big number top-right |
+| [agify.io](https://agify.io) | `age`, `count` | Vertical bar above the name (0 to 90 years), its label, and the big number top-left |
 | [genderize.io](https://genderize.io) | `gender`, `probability` | Horizontal bar to the right, split blue (M) and pink (F) |
 | [nationalize.io](https://nationalize.io) | `country[]` | Stacked segments to the left, top five countries by probability |
 
 Values ease from one name to the next instead of jumping. Click the canvas for a card listing
-the predicted age with sample count, gender with confidence, and the top five nationalities. If
-a request fails or times out after 5 seconds, the app shows built-in sample values for "Alex".
+the predicted age with sample count, gender with confidence, and the top five nationalities.
+The panel has a Name field, a Random button that picks a common first name, and sliders for the
+number of orbiting particles and the aura speed.
 
 The free tier of these APIs allows a limited number of names per day per IP address; past that
-they answer `429 Request limit reached`.
+they answer `429 Request limit reached`. When that happens, or a request fails or times out after
+5 seconds, Omen says so under the age readout and in the footer stamp (`fallback`) and shows
+built-in sample values labelled "Alex".
 
 ## Run it
 
@@ -78,13 +81,8 @@ src/toolcraft/                 Toolcraft runtime and UI components
 <details>
 <summary><b>Known rough edges</b></summary>
 
-- The Random button and the Particles and Aura Speed number inputs are declared in the schema
-  but do not render in the panel.
-- When the APIs are rate-limited the response is still treated as data: the canvas shows
-  0 samples and an F 100% split, and the stamp still says `live`.
 - The orbiting particles use a fixed set of colours, not the predicted countries.
-- The top-right age readout overlaps the controls panel on desktop widths, and short country
-  codes in the nationality stack can overlap.
+- Short country codes in the nationality stack can overlap.
 
 </details>
 
