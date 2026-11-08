@@ -1,0 +1,12 @@
+{
+  "values": {
+    "appearance.background": "#16121C",
+    "chart.view": "living",
+    "export.image.format": "png",
+    "export.image.resolution": "4k",
+    "export.includeBackground": true,
+    "name.text": "Emma"
+  },
+  "canvas": { "size": { "width": 1920, "height": 1080 } },
+  "data": "Bundled public/data/names/e.json and src/omen/survival.json"
+}

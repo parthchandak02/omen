@@ -1,59 +1,25 @@
-import { defineToolcraft } from "@/toolcraft/runtime";
+import { defineToolcraft, imageExportModule } from "@/toolcraft/runtime";
+
+import { backgroundControls, chartControls, nameControls } from "../omen/omen-controls";
+import appDefaults from "./app-defaults.json" with { type: "json" };
+import { appIdentity } from "./app-identity";
 
 export const appSchema = defineToolcraft({
-  canvas: {
-    enabled: true,
-  },
-  panels: {
-    controls: {
-      title: "Omen",
-      sections: [
-        {
-          title: "Name",
-          controls: {
-            nameInput: {
-              type: "text",
-              target: "nameInput",
-              label: "Name",
-              defaultValue: "Alex",
-            },
-            randomName: {
-              type: "actions",
-              target: "randomName",
-              label: false,
-              actions: [{ label: "Random", value: "randomName", variant: "outline" }],
-            },
-          },
-        },
-        {
-          title: "Visuals",
-          controls: {
-            particleCount: {
-              type: "slider",
-              target: "particleCount",
-              label: "Particles",
-              defaultValue: 20,
-              min: 5,
-              max: 60,
-              step: 1,
-            },
-            auraSpeed: {
-              type: "slider",
-              target: "auraSpeed",
-              label: "Aura Speed",
-              defaultValue: 0.5,
-              min: 0.1,
-              max: 2.0,
-              step: 0.1,
-            },
-          },
-        },
-      ],
+  base: {
+    canvas: { draggable: true, enabled: true, renderScale: true, size: { height: 1080, unit: "px", width: 1920 }, sizing: { mode: "editable-output" }, upload: false },
+    identity: appIdentity,
+    panels: {
+      controls: {
+        sections: [
+          { controls: backgroundControls, id: "runtime.setup", title: "Settings" },
+          { controls: nameControls, id: "name", title: "Name" },
+          { controls: chartControls, id: "chart", title: "Chart" },
+        ],
+        title: "Omen",
+      },
     },
+    toolbar: { history: true, radar: true, theme: true, zoom: true },
   },
-  toolbar: {
-    history: false,
-    radar: false,
-    zoom: false,
-  },
+  defaults: appDefaults,
+  modules: [imageExportModule()],
 });

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "title": "Omen",
+  "asset": "public/toolcraft/cover.png",
+  "generation": {
+    "kind": "app-composition",
+    "source": "src/app/app-composition.tsx",
+    "state": "app-cover-state.json",
+    "description": "Actual app export (4K PNG) of the default poster: the name Emma with bundled US Social Security births 1880-2017 and survival estimated for 2026, Living view, plum background; 16:9 output, no editor UI."
+  }
+}

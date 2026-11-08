@@ -3,6 +3,7 @@
 @source "./toolcraft/ui";
 @source "./toolcraft/runtime";
 @import "tw-animate-css";
+@import "@fontsource-variable/inter";
 @import "@/toolcraft/ui/styles.css";
 @import "@/toolcraft/runtime/styles.css";
 
@@ -12,7 +13,7 @@
   --text-2xs--line-height: 0.875rem;
   --text-xs-plus: 0.8125rem;
   --text-xs-plus--line-height: 1.125rem;
-  --font-sans: system-ui, sans-serif;
+  --font-sans: "Inter Variable", sans-serif;
   --font-mono:
     ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --radius-xs: 0.125rem;
@@ -116,38 +117,4 @@ button {
   border-radius: 999px;
   background-color: color-mix(in oklab, var(--foreground) 10%, transparent);
   background-clip: padding-box;
-}
-
-/* The Toolcraft shell has a 1024px minimum width; on phones let it shrink to the
-   screen so the scene is centred and the controls panel is reachable */
-@media (max-width: 1023px) {
-  [data-slot="toolcraft-runtime-app"] {
-    min-width: 0 !important;
-  }
-}
-
-/* Below desktop widths the data stamp runs into the toolbar button (and wraps on phones);
-   lift it, the legend and the description */
-@media (max-width: 1023px) {
-  #stamp {
-    bottom: 56px !important;
-    right: 16px;
-  }
-  #legend {
-    bottom: 100px !important;
-  }
-  #desc {
-    bottom: 122px !important;
-    width: 90vw;
-  }
-}
-
-@media (max-width: 600px) {
-  /* Clear the collapsed controls header at the top right */
-  #hero {
-    top: 64px !important;
-  }
-  #notice {
-    top: 150px !important;
-  }
 }
